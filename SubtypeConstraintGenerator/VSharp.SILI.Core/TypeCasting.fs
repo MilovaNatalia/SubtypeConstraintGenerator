@@ -38,6 +38,7 @@ module internal TypeCasting =
         match term.term with
         | Ptr(_, _, typ, _) -> castPointer term typ
         | Ref(TopLevelHeap(addr, baseType, _), []) -> HeapRef term.metadata addr baseType targetType []
+        | Struct(h, _) -> Struct term.metadata h targetType
         | _ -> __unreachable__()
 
     let rec canCast mtd state targetType term =

@@ -1334,8 +1334,7 @@ module internal Interpreter =
         let result = ast.Type |> MetadataTypes.fromMetadataType state |> Types.SizeOf |> MakeNumber
         k (result, state)
 
-    and reduceStackAllocExpression state (ast : IStackAllocExpression) k =
-        __notImplemented__()
+    and reduceStackAllocExpression state (ast : IStackAllocExpression) k = k (Nop, state)
 
     and reduceUntypedStackAllocExpression state (ast : IUntypedStackAllocExpression) k =
         __notImplemented__()
