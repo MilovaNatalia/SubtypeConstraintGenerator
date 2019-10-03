@@ -3,6 +3,10 @@ namespace VSharp.Core
 open VSharp
 
 module API =
+    
+    type public Term (term : term) =
+        member x.Term = term
+        override x.ToString() = toString term
     let private m = let r = new persistent<_>(always Metadata.empty, id) in r.Reset(); r
     let Enter (location : locationBinding) state k =
         m.Save()

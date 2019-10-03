@@ -120,9 +120,27 @@ module internal Interpreter =
 // ------------------------------- Member calls -------------------------------
 
     and decompileAndReduceMethod caller state this parameters qualifiedTypeName (metadataMethod : IMetadataMethod) assemblyPath k =
-        if metadataMethod.IsVirtual && (not metadataMethod.IsFinal) && Option.isSome this
-            then decompileAndReduceVirtualMethod assemblyPath caller state (Option.get this) parameters metadataMethod k
-            else decompileAndReduceFinalMethod caller state this parameters qualifiedTypeName (metadataMethod : IMetadataMethod) assemblyPath k
+        let linqStrings = "System.Linq.Strings, System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let filters = "System.__Filters, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let comparer = "System.Collections.Generic.EqualityComparer`1, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let enviroment = "System.Environment, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let throwHelper = "System.ThrowHelper, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        if
+            metadataMethod.DeclaringType.AssemblyQualifiedName
+         |> Type.GetType
+         |> fun typ ->
+             typeof<System.Exception>.IsAssignableFrom typ
+          || typeof<System.Array>.IsAssignableFrom typ
+          || (Type.GetType(linqStrings)).IsAssignableFrom typ
+          || (Type.GetType(filters)).IsAssignableFrom typ
+          || (Type.GetType(comparer)).IsAssignableFrom typ
+          || (Type.GetType(enviroment)).IsAssignableFrom typ
+          || (Type.GetType(throwHelper)).IsAssignableFrom typ
+        then k ((NoResult ()), state)
+        else
+            if metadataMethod.IsVirtual && (not metadataMethod.IsFinal) && Option.isSome this
+                then decompileAndReduceVirtualMethod assemblyPath caller state (Option.get this) parameters metadataMethod k
+                else decompileAndReduceFinalMethod caller state this parameters qualifiedTypeName (metadataMethod : IMetadataMethod) assemblyPath k
 
     and decompileAndReduceFinalMethod caller state this parameters qualifiedTypeName (metadataMethod : IMetadataMethod) assemblyPath k =
         let reduceMethod caller state parameters assemblyPath this qualifiedTypeName (metadataMethod : IMetadataMethod) decompiledMethod k =
@@ -181,9 +199,27 @@ module internal Interpreter =
             choice acc foundMethod
         let res = Cps.Seq.foldlk findVirtualMethod None suitableTypes id
         let virtualMethod = res |?? metadataMethodPattern
-        if virtualMethod.IsAbstract
-            then reduceAbstractMethodApplication caller {metadataMethod = virtualMethod; state = {v = state}} state k
-            else decompileAndReduceFinalMethod caller state (Some this) parameters virtualMethod.DeclaringType.AssemblyQualifiedName virtualMethod assemblyPath k
+        let linqStrings = "System.Linq.Strings, System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let filters = "System.__Filters, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let comparer = "System.Collections.Generic.EqualityComparer`1, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let enviroment = "System.Environment, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        let throwHelper = "System.ThrowHelper, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        if
+            virtualMethod.DeclaringType.AssemblyQualifiedName
+         |> Type.GetType
+         |> fun typ ->
+             typeof<System.Exception>.IsAssignableFrom typ
+          || typeof<System.Array>.IsAssignableFrom typ
+          || (Type.GetType(linqStrings)).IsAssignableFrom typ
+          || (Type.GetType(filters)).IsAssignableFrom typ
+          || (Type.GetType(comparer)).IsAssignableFrom typ
+          || (Type.GetType(enviroment)).IsAssignableFrom typ
+          || (Type.GetType(throwHelper)).IsAssignableFrom typ
+        then k ((NoResult ()), state)
+        else
+            if virtualMethod.IsAbstract
+                then reduceAbstractMethodApplication caller {metadataMethod = virtualMethod; state = {v = state}} state k
+                else decompileAndReduceFinalMethod caller state (Some this) parameters virtualMethod.DeclaringType.AssemblyQualifiedName virtualMethod assemblyPath k
 
     and decompileAndReduceVirtualMethod assemblyPath caller state this parameters metadataMethodPattern k =
         let metadataTypeInfoPattern = metadataMethodPattern.DeclaringType

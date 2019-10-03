@@ -4,6 +4,11 @@ open VSharp
 
 [<AutoOpen>]
 module API =
+    [<Class>]
+    type Term =
+        new : term -> Term
+        member Term : term
+
     val Enter : locationBinding -> state -> ('a -> 'b) -> ('a -> 'b)
 
     val Configure : IActivator -> IInterpreter -> unit

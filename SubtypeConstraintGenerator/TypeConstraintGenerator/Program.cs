@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using VSharp.Core;
 using VSharp.Interpreter;
 using VSharp.Interpreter;
 
@@ -83,9 +84,16 @@ namespace TypeConstraintGenerator
 
             var ignoredLibs = new List<string>
             {
+                "mscorlib.dll",
+//                "SubtypeGeneratorTest.dll",
+//                "GeneratorTest.dll"
             };
 
             var ignoredTypes = new List<string>
+            {
+            };
+            
+            var whiteTypes = new List<string>
             {
             };
 
@@ -105,7 +113,7 @@ namespace TypeConstraintGenerator
                     AppDomain currentDomain = AppDomain.CurrentDomain;
                     currentDomain.AssemblyResolve += LoadFromTestFolder;
 
-                    IDictionary<MethodInfo, IEnumerable<string>> got = SVM.RunGenerator(Assembly.LoadFile(lib), ignoredTypes);
+                    IDictionary<MethodInfo, IEnumerable<API.Term>> got = SVM.RunGenerator(Assembly.LoadFile(lib), ignoredTypes, whiteTypes);
 
                     foreach (var constr in got.Values)
                     {
