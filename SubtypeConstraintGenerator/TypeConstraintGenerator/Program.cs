@@ -4,13 +4,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
+using VSharp.Interpreter;
 using VSharp.Core;
-using VSharp.Interpreter;
-using VSharp.Interpreter;
 
 namespace TypeConstraintGenerator
 {
@@ -84,17 +80,19 @@ namespace TypeConstraintGenerator
 
             var ignoredLibs = new List<string>
             {
-                "mscorlib.dll",
-//                "SubtypeGeneratorTest.dll",
-//                "GeneratorTest.dll"
+                "System.Core.dll",
+                "GeneratorTest.dll"
             };
 
             var ignoredTypes = new List<string>
             {
+                "System.Linq.Error"
             };
-            
+
             var whiteTypes = new List<string>
             {
+                "System.Collections.Generic",
+//                "System.Linq"
             };
 
             string pathToTests = Path.Combine(Path.GetFullPath("."), "..", "..", "..", TestsDirectoryName);

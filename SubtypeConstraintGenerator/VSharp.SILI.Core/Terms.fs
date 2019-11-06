@@ -227,7 +227,7 @@ and
 
 and
     [<CustomEquality;NoComparison>]
-    term =
+    public term =
         {term : termNode; metadata : termMetadata}
         override x.ToString() = x.term.ToString()
         override x.GetHashCode() = x.term.GetHashCode()

@@ -42,6 +42,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SubtypeGeneratorTest\SubtypeGeneratorTest.csproj">
+      <Project>{3bbf370e-1224-43b7-bfd3-bd42905365c4}</Project>
+      <Name>SubtypeGeneratorTest</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VSharp.SILI.Core\VSharp.SILI.Core.fsproj">
       <Project>{270acd61-be60-4d72-85ad-d9385fd84c8e}</Project>
       <Name>VSharp.SILI.Core</Name>

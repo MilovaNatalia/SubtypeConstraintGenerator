@@ -20,7 +20,7 @@ type arrayDimensionType =
     | SymbolicDimension of string transparent
 
 [<StructuralEquality;NoComparison>]
-type termType =
+type public termType =
     | Void
     | Bottom
     | Null
