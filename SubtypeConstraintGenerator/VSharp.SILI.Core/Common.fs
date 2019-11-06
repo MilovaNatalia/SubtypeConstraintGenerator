@@ -11,7 +11,7 @@ type ISolver =
     abstract Solve : term -> SolverResult
     abstract SolvePathCondition : term -> term list -> SolverResult
 
-module internal Common =
+module public Common =
     let mutable private solver : ISolver option = None
     let configureSolver s = solver <- Some s
     let private solve term =
@@ -60,7 +60,7 @@ module internal Common =
 
     // TODO: support composition for this constant source
     [<StructuralEquality;NoComparison>]
-    type private symbolicSubtypeSource =
+    type public symbolicSubtypeSource =
         {left : termType; right : termType}
         interface IStatedSymbolicConstantSource with
             override x.SubTerms = Seq.empty

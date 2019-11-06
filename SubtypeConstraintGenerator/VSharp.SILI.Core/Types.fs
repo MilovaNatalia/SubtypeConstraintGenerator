@@ -88,7 +88,7 @@ and [<CustomEquality;CustomComparison>]
                         compare (c1.GetHashCode()) (c2.GetHashCode())
                 | _ -> -1
 
-module internal Types =
+module public Types =
     let (|StructType|_|) = function
         | StructType(t, g) -> Some(StructType(t, g))
         | _ -> None

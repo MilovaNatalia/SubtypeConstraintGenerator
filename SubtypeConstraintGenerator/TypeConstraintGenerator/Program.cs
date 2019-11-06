@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Security.AccessControl;
 using System.Threading;
 using VSharp.Interpreter;
 using VSharp.Core;
@@ -69,7 +70,7 @@ namespace TypeConstraintGenerator
             return null;
         }
 
-        public void Generate()
+        public static List<Tuple<IEnumerable<Tuple<object, object>>, IEnumerable<Tuple<object, object>>>> Generate()
         {
             Trace.Listeners.Add(new DumpStackTraceListener());
 
@@ -80,20 +81,17 @@ namespace TypeConstraintGenerator
 
             var ignoredLibs = new List<string>
             {
-                "System.Core.dll",
-                "GeneratorTest.dll"
             };
 
             var ignoredTypes = new List<string>
             {
-                "System.Linq.Error"
             };
 
             var whiteTypes = new List<string>
             {
-                "System.Collections.Generic",
-//                "System.Linq"
             };
+            
+            var result = new List<Tuple<IEnumerable<Tuple<object, object>>, IEnumerable<Tuple<object, object>>>>();
 
             string pathToTests = Path.Combine(Path.GetFullPath("."), "..", "..", "..", TestsDirectoryName);
             string[] tests = Directory.GetDirectories(pathToTests);
@@ -113,15 +111,62 @@ namespace TypeConstraintGenerator
 
                     IDictionary<MethodInfo, IEnumerable<API.Term>> got = SVM.RunGenerator(Assembly.LoadFile(lib), ignoredTypes, whiteTypes);
 
+                    
                     foreach (var constr in got.Values)
                     {
+                        var positives = new List<Tuple<object, object>>();
+                        var negatives = new List<Tuple<object, object>>();
+                        
                         foreach (var str in constr)
                         {
-                            Console.WriteLine(str);
+                            var negation = false;
+                            termNode.Constant c;
+                            if (str.Term.term.IsConstant)
+                            {
+                                c = (termNode.Constant) str.Term.term;
+                            }
+                            else
+                            {
+                                c = (termNode.Constant) ((termNode.Expression) str.Term.term).Item2[0].term;
+                                negation = true;
+                            }
+
+                            var subtypeSource = (Common.symbolicSubtypeSource) c.Item2;
+
+                            object left;
+                            object right;
+
+                            if (subtypeSource.left is termType.TypeVariable)
+                                left = subtypeSource.left.ToString();
+                            else
+                            {
+                                left = Types.toDotNetType(subtypeSource.left);
+                            }
+
+                            if (subtypeSource.right is termType.TypeVariable)
+                                right = subtypeSource.right.ToString();
+                            else
+                            {
+                                right = Types.toDotNetType(subtypeSource.right);
+                            }
+                            
+                            if (negation)
+                                negatives.Add(new Tuple<object, object>(left, right));
+                            else
+                            {
+                                positives.Add(new Tuple<object, object>(left, right));   
+                            }
                         }
+
+                        result.Add(
+                            new Tuple<IEnumerable<Tuple<object, object>>, IEnumerable<Tuple<object, object>>>(positives,
+                                negatives));
                     }
+                    
                 }
             }
+
+            return result;
         }
     }
 
@@ -129,8 +174,7 @@ namespace TypeConstraintGenerator
     {
         public static void Main(string[] args)
         {
-            var tests = new Generator();
-            tests.Generate();
+            Generator.Generate();
         }
     }
 }
