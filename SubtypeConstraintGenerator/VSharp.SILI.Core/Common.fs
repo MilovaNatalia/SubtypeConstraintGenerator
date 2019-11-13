@@ -105,7 +105,7 @@ module public Common =
         | Bottom, _ | _, Bottom -> makeFalse metadata
         | Reference _, Reference _ -> makeTrue metadata
         | Pointer _, Pointer _ -> makeTrue metadata
-        | Func(largs, lret) , Func(rargs, rret) -> makeSubtypeBoolConst leftType rightType
+        | Func(_, largs, lret) , Func(_, rargs, rret) -> makeSubtypeBoolConst leftType rightType
         | ArrayType _ as t1, (ArrayType(_, SymbolicDimension name) as t2) ->
             if name.v = "System.Array" then makeTrue metadata else makeSubtypeBoolConst t1 t2
         | ArrayType(_, SymbolicDimension _) as t1, (ArrayType _ as t2)  when t1 <> t2 ->
@@ -144,7 +144,7 @@ module public Common =
                 else makeFalse metadata
         | _ -> makeFalse metadata
 
-    type symbolicSubtypeSource with
+    type public symbolicSubtypeSource with
         interface IStatedSymbolicConstantSource with
             override x.Compose ctx state =
                 let left = State.substituteTypeVariables ctx state x.left

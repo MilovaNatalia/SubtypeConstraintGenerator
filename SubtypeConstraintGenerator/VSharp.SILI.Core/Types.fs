@@ -31,7 +31,7 @@ type public termType =
     | InterfaceType of System.Type * termType list     // Interface type with generic argument
     | TypeVariable of typeId
     | ArrayType of termType * arrayDimensionType
-    | Func of termType list * termType //TODO: Do we really need Func type?
+    | Func of System.Type option * termType list * termType //TODO: Do we really need Func type?
     | Reference of termType
     | Pointer of termType // C-style pointers like int*
 
@@ -42,7 +42,7 @@ type public termType =
         | Null -> "<nullType>"
         | Bool -> typedefof<bool>.FullName
         | Numeric t -> t.FullName
-        | Func(domain, range) -> String.Join(" -> ", List.append domain [range])
+        | Func(t, domain, range) -> String.Join(" -> ", List.append domain [range])
         | StructType(t, g)
         | ClassType(t, g)
         | InterfaceType(t, g) ->
@@ -61,7 +61,7 @@ type public termType =
         | Pointer t -> sprintf "<Pointer to %O>" t
 
 and [<CustomEquality;CustomComparison>]
-    typeId =
+    public typeId =
         | Explicit of System.Type
         | Implicit of (string transparent) * ISymbolicTypeSource * termType
         override x.GetHashCode() =
@@ -162,11 +162,11 @@ module public Types =
         | _ -> false
 
     let domainOf = function
-        | Func(domain, _) -> domain
+        | Func(_, domain, _) -> domain
         | _ -> []
 
     let rangeOf = function
-        | Func(_, range) -> range
+        | Func(_, _, range) -> range
         | t -> t
 
     let elementType = function
@@ -224,7 +224,7 @@ module public Types =
     let bitSizeOfType t (resultingType : System.Type) = System.Convert.ChangeType(sizeOf(t) * 8, resultingType)
 
 
-    module internal Constructor =
+    module public Constructor =
         let private StructType (t : Type) g = StructType t g
         let private ClassType (t : Type) g = ClassType t g
         let private InterfaceType (t : Type) g = InterfaceType t g
@@ -270,7 +270,7 @@ module public Types =
                 let parameters = methodInfo.GetParameters() |>
                                     Seq.map (fun (p : System.Reflection.ParameterInfo) ->
                                     fromCommonDotNetType p.ParameterType)
-                Func(List.ofSeq parameters, returnType)
+                Func(Some f, List.ofSeq parameters, returnType)
             | p when p.IsGenericParameter -> fromDotNetGenericParameter p
             | c when c.IsClass -> ClassType c (getGenericArguments c)
             | i when i.IsInterface -> makeInterfaceType i

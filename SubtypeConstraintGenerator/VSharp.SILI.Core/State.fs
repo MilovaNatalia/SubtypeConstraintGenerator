@@ -73,7 +73,7 @@ type IExtractingSymbolicTypeSource =
     inherit IStatedSymbolicTypeSource
     abstract WithTypeExtractor : TypeExtractor -> IExtractingSymbolicTypeSource
 
-module internal State =
+module public State =
 
     module SymbolicHeap = Heap
 
@@ -207,6 +207,7 @@ module internal State =
         | None -> internalfailf "stack does not contain key %O!" key
 
     let withPathCondition (s : state) cond : state = { s with pc = cond::s.pc; traceConstraint = cond::s.traceConstraint }
+    let withPathConditionWithoutTrace (s : state) cond : state = { s with pc = cond::s.pc; }
     let popPathCondition (s : state) : state =
         match s.pc with
         | [] -> internalfail "cannot pop empty path condition"
@@ -258,7 +259,7 @@ module internal State =
             match source with
             | :? IExtractingSymbolicTypeSource as ext -> ext.WithTypeExtractor(ArrayTypeExtractor()).TypeCompose ctx state
             | _ -> TypeVariable(Implicit(name, source, substituteTypeVariables t))
-        | Func(domain, range) -> Func(List.map (substituteTypeVariables) domain, substituteTypeVariables range)
+        | Func(t, domain, range) -> Func(t, List.map (substituteTypeVariables) domain, substituteTypeVariables range)
         | StructType(t, args) -> substitute Types.StructType t args
         | ClassType(t, args) -> substitute Types.ClassType t args
         | InterfaceType(t, args) -> substitute Types.InterfaceType t args

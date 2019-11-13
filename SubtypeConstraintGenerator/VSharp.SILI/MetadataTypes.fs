@@ -63,14 +63,14 @@ module internal MetadataTypes =
         let paramToType (param : JetBrains.Decompiler.Ast.IMethodParameter) =
             fromMetadataType state param.Type
         let args = Seq.map paramToType signature.Parameters |> List.ofSeq
-        Func(args, returnType)
+        Func(None, args, returnType)
 
     let fromMetadataMethodSignature state (m : IMetadataMethod) =
         let returnType = fromMetadataType state m.ReturnValue.Type
         let paramToType (param : IMetadataParameter) =
             fromMetadataType state param.Type
         let args = Seq.map paramToType m.Parameters |> List.ofSeq
-        Func(args, returnType)
+        Func(None, args, returnType)
 
     let getMetadataTypeOfNode (node : JetBrains.Decompiler.Ast.INode) =
         DecompilerServices.getTypeOfNode node

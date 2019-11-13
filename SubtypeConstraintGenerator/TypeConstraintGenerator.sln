@@ -12,6 +12,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "VSharp.Utils", "VSharp.Util
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeConstraintGenerator", "TypeConstraintGenerator\TypeConstraintGenerator.csproj", "{F237ECD2-5DB1-478B-98C9-43CF76655F17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CGenerator", "..\..\CGenerator\CGenerator\CGenerator.csproj", "{BE643A38-F646-4A12-9AEB-2EA22F845ECE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{F237ECD2-5DB1-478B-98C9-43CF76655F17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F237ECD2-5DB1-478B-98C9-43CF76655F17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F237ECD2-5DB1-478B-98C9-43CF76655F17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE643A38-F646-4A12-9AEB-2EA22F845ECE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE643A38-F646-4A12-9AEB-2EA22F845ECE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE643A38-F646-4A12-9AEB-2EA22F845ECE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE643A38-F646-4A12-9AEB-2EA22F845ECE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

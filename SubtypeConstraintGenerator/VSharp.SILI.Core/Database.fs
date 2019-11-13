@@ -7,6 +7,7 @@ type functionSummary = { result : term; state : state }
 
 
 module internal Database =
+    let emptySummary = { result = Nop; state = State.empty }
     let private summaries = new Dictionary<IFunctionIdentifier, functionSummary>()
 
     let reported id = summaries.ContainsKey id

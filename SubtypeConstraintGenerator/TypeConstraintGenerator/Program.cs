@@ -9,6 +9,7 @@ using System.Threading;
 using VSharp.Interpreter;
 using VSharp.Core;
 
+
 namespace TypeConstraintGenerator
 {
     public class DumpStackTraceListener : TraceListener
@@ -136,15 +137,25 @@ namespace TypeConstraintGenerator
                             object left;
                             object right;
 
-                            if (subtypeSource.left is termType.TypeVariable)
-                                left = subtypeSource.left.ToString();
+                            if (subtypeSource.left.IsTypeVariable)
+                                if (((termType.TypeVariable)subtypeSource.left).Item.IsImplicit)
+                                    left = subtypeSource.left.ToString();
+                                else
+                                {
+                                    left = Types.toDotNetType(subtypeSource.left);
+                                }
                             else
                             {
                                 left = Types.toDotNetType(subtypeSource.left);
                             }
 
-                            if (subtypeSource.right is termType.TypeVariable)
-                                right = subtypeSource.right.ToString();
+                            if (subtypeSource.right.IsTypeVariable)
+                                if (((termType.TypeVariable)subtypeSource.right).Item.IsImplicit)
+                                    right = subtypeSource.right.ToString();
+                                else
+                                {
+                                    right = Types.toDotNetType(subtypeSource.right);
+                                }
                             else
                             {
                                 right = Types.toDotNetType(subtypeSource.right);
@@ -160,6 +171,9 @@ namespace TypeConstraintGenerator
 
                         result.Add(
                             new Tuple<IEnumerable<Tuple<object, object>>, IEnumerable<Tuple<object, object>>>(positives,
+                                new List<Tuple<object, object>>()));
+                        result.Add(
+                            new Tuple<IEnumerable<Tuple<object, object>>, IEnumerable<Tuple<object, object>>>(new List<Tuple<object, object>>(),
                                 negatives));
                     }
                     

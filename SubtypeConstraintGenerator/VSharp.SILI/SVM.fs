@@ -23,8 +23,8 @@ module public SVM =
             printLog Warning "WARNING: metadata method for %s.%s not found!" qualifiedTypeName m.Name
             None
         | Some metadataMethod ->
-            dictionary |> Option.iter (fun dictionary -> dictionary.Add(m, null))
             let summary = invoke ({ metadataMethod = metadataMethod; state = {v = Memory.EmptyState}}) id
+            dictionary |> Option.iter (fun dictionary -> dictionary.Add(m, null))
             printfn
                 "*********************************************\n%O\n*************************************************\n"
                 (Seq.map toString (atomizeSubtypeConstraint summary) |> String.concat "\n")
