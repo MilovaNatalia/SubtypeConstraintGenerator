@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Threading;
 using VSharp.Interpreter;
@@ -71,6 +72,38 @@ namespace TypeConstraintGenerator
             return null;
         }
 
+
+        private static object TermToDotNetType(termType termType)
+        {
+            var term = termType;
+
+            if (term.IsArrayType)
+            {
+                if (((termType.ArrayType) term).Item1 is termType.TypeVariable arrayElements && arrayElements.Item.IsImplicit)
+                    term = ((termType.ArrayType) term).Item1;
+            }
+
+            if (term.IsFunc)
+            {
+                return ((termType.Func) term).Item1.Value;
+            }
+
+            if (term.IsTypeVariable)
+            {
+                if (((termType.TypeVariable) term).Item.IsImplicit)
+                    return term.ToString();
+                else
+                {
+                    return Types.toDotNetType(term);
+                }
+            }
+            else
+            {
+                                
+                return Types.toDotNetType(term);
+            }
+        }
+        
         public static List<Tuple<IEnumerable<Tuple<object, object>>, IEnumerable<Tuple<object, object>>>> Generate()
         {
             Trace.Listeners.Add(new DumpStackTraceListener());
@@ -133,39 +166,15 @@ namespace TypeConstraintGenerator
                             }
 
                             var subtypeSource = (Common.symbolicSubtypeSource) c.Item2;
-
-                            object left;
-                            object right;
-
-                            if (subtypeSource.left.IsTypeVariable)
-                                if (((termType.TypeVariable)subtypeSource.left).Item.IsImplicit)
-                                    left = subtypeSource.left.ToString();
-                                else
-                                {
-                                    left = Types.toDotNetType(subtypeSource.left);
-                                }
-                            else
-                            {
-                                left = Types.toDotNetType(subtypeSource.left);
-                            }
-
-                            if (subtypeSource.right.IsTypeVariable)
-                                if (((termType.TypeVariable)subtypeSource.right).Item.IsImplicit)
-                                    right = subtypeSource.right.ToString();
-                                else
-                                {
-                                    right = Types.toDotNetType(subtypeSource.right);
-                                }
-                            else
-                            {
-                                right = Types.toDotNetType(subtypeSource.right);
-                            }
                             
+                            var left = subtypeSource.left;
+                            var right= subtypeSource.right;
+
                             if (negation)
-                                negatives.Add(new Tuple<object, object>(left, right));
+                                negatives.Add(new Tuple<object, object>(TermToDotNetType(left), TermToDotNetType(right)));
                             else
                             {
-                                positives.Add(new Tuple<object, object>(left, right));   
+                                positives.Add(new Tuple<object, object>(TermToDotNetType(left), TermToDotNetType(right)));   
                             }
                         }
 
